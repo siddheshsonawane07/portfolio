@@ -5,10 +5,11 @@ export const Bio = {
     "I am a motivated and versatile individual, always eager to take on new challenges. With a passion for learning I am dedicated to delivering high-quality results. With a positive attitude and a growth mindset, I am ready to make a meaningful contribution and achieve great things.",
   github: "https://github.com/siddheshsonawane07",
   resume:
-    "https://drive.google.com/file/d/1l4b7nd_MJtWqEM3nbFAsrUGvFKbSUccZ/view?usp=sharing",
+    "https://drive.google.com/file/d/1Ycj8UmX0F64YbXN3tkX_H6wSr0izhPSH/view?usp=sharing",
   linkedin: "https://www.linkedin.com/in/siddheshsonawane07/",
-  twitter: "https://x.com/SiddheshSonawa8",
+  twitter: "https://x.com/siddhesh_07_dev",
   insta: "https://www.instagram.com/_siddhesh___07/",
+  medium: "https://medium.com/@siddheshsonawane07",
 };
 
 export const skills = [
@@ -180,26 +181,26 @@ export const experiences = [
 export const education = [
   {
     id: 0,
-    school: "Dr. D.Y. Patil Institute of Technology, Pimpri",
+    school: "Dr. D.Y. Patil Institute of Technology, Pimpri, Pune",
     date: "Jun 2020 - Jun 2024",
-    grade: "8.75 CGPA",
+    grade: "8.76 CGPA",
     desc: "I have completed my Bachelor's degree in Computer Engineering at Dr. D.Y. Patil Institute of Technology, Pimpri, with a CGPA of 8.75. During my studies, I took courses in Data Structures, Algorithms, Object-Oriented Programming, Database Management Systems, Operating Systems, and Computer Networks, among others. I also served as the Flutter Co-Lead of the Google Developers Student Club (GDSC) at DIT, where I conducted sessions on cross-platform development using Flutter and worked on exciting projects with a team of talented developers.",
     degree: "Bachelor of Computer Engineering",
   },
   {
     id: 1,
-    school: "Bharat English School & Jr. College, Shivajinagar",
+    school: "Bharat English School & Jr. College, Shivajinagar, Pune",
     date: "Apr 2018 - Apr 2020",
     grade: "77.34%",
-    desc: "I completed my class 12 junior college education at Bharat English School & Jr. College, Shivajinagar where I studied Science with PCMB",
+    desc: "I completed my class 12th junior college education at Bharat English School & Jr. Collegewhere I studied Science with PCMB.",
     degree: "HSC(XII)",
   },
   {
     id: 2,
-    school: "The Trinity School, Kalas",
+    school: "The Trinity School, Kalas, Pune",
     date: "Apr 2008 - Apr 2017",
     grade: "86.6%",
-    desc: "I completed my class 10 education at The Trinity School, Kalas.",
+    desc: "I completed my class 10th education at The Trinity School. ",
     degree: "SSC(X)",
   },
 ];
