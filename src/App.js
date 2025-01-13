@@ -1,9 +1,15 @@
-import { ThemeProvider } from "styled-components";
-import { useState } from "react";
-import { darkTheme, lightTheme } from "./utils/Themes.js";
-import Navbar from "./components/Navbar";
-import "./App.css";
+// React and routing
+import { useState, memo } from "react";
 import { BrowserRouter as Router } from "react-router-dom";
+import { ThemeProvider } from "styled-components";
+
+// Themes and styles
+import { darkTheme, lightTheme } from "./utils/Themes.js";
+import styled from "styled-components";
+import "./App.css";
+
+// Components
+import Navbar from "./components/Navbar";
 import HeroSection from "./components/HeroSection";
 import Skills from "./components/Skills";
 import Projects from "./components/Projects";
@@ -11,15 +17,20 @@ import Footer from "./components/Footer";
 import Experience from "./components/Experience";
 import Education from "./components/Education";
 import ProjectDetails from "./components/ProjectDetails";
-import styled from "styled-components";
+import Chatbot from "./components/Chatbot/index.jsx";
 
-const Body = styled.div`
+// Memoize static styled components
+const Body = styled.div.withConfig({
+  shouldComponentUpdate: true,
+})`
   background-color: ${({ theme }) => theme.bg};
   width: 100%;
   overflow-x: hidden;
 `;
 
-const Wrapper = styled.div`
+const Wrapper = styled.div.withConfig({
+  shouldComponentUpdate: true,
+})`
   background: linear-gradient(
       38.73deg,
       rgba(204, 0, 187, 0.15) 0%,
@@ -34,6 +45,13 @@ const Wrapper = styled.div`
   clip-path: polygon(0 0, 100% 0, 100% 100%, 30% 98%, 0 100%);
 `;
 
+// Memoize static components
+const MemoizedSkills = memo(Skills);
+const MemoizedExperience = memo(Experience);
+const MemoizedEducation = memo(Education);
+const MemoizedFooter = memo(Footer);
+const MemoizedHeroSection = memo(HeroSection);
+
 function App() {
   const [darkMode, setDarkMode] = useState(true);
   const [openModal, setOpenModal] = useState({ state: false, project: null });
@@ -43,23 +61,24 @@ function App() {
       <Router>
         <Navbar darkMode={darkMode} setDarkMode={setDarkMode} />
         <Body>
-          <HeroSection />
+          <MemoizedHeroSection />
           <Wrapper>
-            <Skills />
-            <Experience />
+            <MemoizedSkills />
+            <MemoizedExperience />
           </Wrapper>
           <Projects openModal={openModal} setOpenModal={setOpenModal} />
           <Wrapper>
-            <Education />
+            <MemoizedEducation />
           </Wrapper>
-          <Footer />
+          <MemoizedFooter />
           {openModal.state && (
             <ProjectDetails openModal={openModal} setOpenModal={setOpenModal} />
           )}
         </Body>
+        <Chatbot />
       </Router>
     </ThemeProvider>
   );
 }
 
-export default App;
+export default memo(App);

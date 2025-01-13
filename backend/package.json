@@ -10,10 +10,17 @@
   "license": "ISC",
   "type": "module",
   "dependencies": {
+    "@langchain/community": "^0.3.24",
+    "@langchain/core": "^0.3.29",
+    "@langchain/openai": "^0.3.17",
     "@octokit/rest": "^21.1.0",
+    "axios": "^1.7.9",
+    "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "faiss-node": "^0.5.1",
     "helmet": "^8.0.0",
+    "langchain": "^0.3.11",
     "morgan": "^1.10.0",
     "nodemon": "^3.1.9"
   }
