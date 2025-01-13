@@ -1,9 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { MessageCircle, X, Send } from 'lucide-react';
-import axios from 'axios';
-
-const API_BASE_URL = 'http://localhost:3000';
 
 const ChatContainer = styled.div`
   position: fixed;
@@ -16,6 +13,8 @@ const ChatContainer = styled.div`
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   transition: all 0.3s ease-in-out;
+  display: flex;
+  flex-direction: column;
 `;
 
 const ChatToggle = styled.div`
@@ -27,6 +26,9 @@ const ChatToggle = styled.div`
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  &:hover {
+    background-color: #2563eb;
+  }
 `;
 
 const ChatHeader = styled.div`
@@ -36,6 +38,21 @@ const ChatHeader = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+
+  button {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    &:hover {
+      background-color: #2563eb;
+    }
+  }
 `;
 
 const MessagesContainer = styled.div`
@@ -45,6 +62,7 @@ const MessagesContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  background-color: white;
 `;
 
 const MessageBubble = styled.div`
@@ -70,6 +88,7 @@ const ChatForm = styled.form`
   border-top: 1px solid #e5e7eb;
   display: flex;
   gap: 0.5rem;
+  background-color: white;
 `;
 
 const ChatInput = styled.input`
@@ -90,6 +109,7 @@ const SubmitButton = styled.button`
   padding: 0.5rem;
   background-color: #3b82f6;
   color: white;
+  border: none;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -129,10 +149,21 @@ const Chatbot = () => {
 
   const initializeIndex = async () => {
     try {
-      const response = await axios.post(`${API_BASE_URL}/api/initialize`);
-      console.log('Index initialized:', response.data.message);
+      const response = await fetch('http://localhost:3000/api/initialize', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to initialize index');
+      }
+      
+      const data = await response.json();
+      console.log('Index initialized:', data.message);
     } catch (error) {
-      console.error('Failed to initialize index:', error.response?.data?.error || error.message);
+      console.error('Failed to initialize index:', error.message);
     }
   };
 
@@ -147,19 +178,29 @@ const Chatbot = () => {
     setMessages((prev) => [...prev, { text: userMessage, sender: 'user' }]);
 
     try {
-      const response = await axios.post(`${API_BASE_URL}/api/chat`, {
-        question: userMessage,
+      const response = await fetch('http://localhost:3000/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          question: userMessage,
+        }),
       });
 
+      if (!response.ok) {
+        throw new Error('Server error');
+      }
+
+      const data = await response.json();
       setMessages((prev) => [
         ...prev,
-        { text: response.data.answer || 'No response from AI.', sender: 'bot' },
+        { text: data.answer || 'No response from AI.', sender: 'bot' },
       ]);
     } catch (error) {
-      const errorMessage = error.response?.data?.error || 'Server error. Please try again.';
       setMessages((prev) => [
         ...prev,
-        { text: errorMessage, sender: 'bot', error: true },
+        { text: 'Server error. Please try again.', sender: 'bot', error: true },
       ]);
     } finally {
       setIsLoading(false);
@@ -175,9 +216,9 @@ const Chatbot = () => {
       {isOpen && (
         <>
           <ChatHeader>
-            <span>Chat with AI</span>
+            <span>Chat about ME (with bot)</span>
             <button onClick={toggleChat}>
-              <X size={24} color="white" />
+              <X size={24} />
             </button>
           </ChatHeader>
 

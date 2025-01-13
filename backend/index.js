@@ -13,7 +13,6 @@ import { PromptTemplate } from "@langchain/core/prompts";
 import cors from "cors";
 import axios from "axios";
 
-// Load environment variables
 dotenv.config();
 
 if (!process.env.GITHUB_AUTH_TOKEN) {
@@ -23,9 +22,8 @@ if (!process.env.OPENAI_API_KEY) {
   throw new Error("OPENAI_API_KEY is not set in the environment variables");
 }
 
-// Initialize Express and Octokit
 const app = express();
-const port = process.env.PORT || 3000;
+const port = 3000;
 const octokit = new Octokit({ auth: process.env.GITHUB_AUTH_TOKEN });
 
 // Middleware
@@ -34,9 +32,10 @@ app.use(cors());
 app.use(express.json());
 app.use(morgan("combined"));
 
-// Global FAISS vector store
-let vectorStore = null;
-let isVectorStoreReady = false;
+// Global variables for FAISS store and initialization status
+let globalVectorStore = null;
+let isInitializing = false;
+let initializationError = null;
 
 // Format repository data for FAISS
 function formatRepoDataForFaiss(repoData) {
@@ -57,27 +56,27 @@ function formatRepoDataForFaiss(repoData) {
   });
 }
 
-// Create FAISS index
-async function createFaissIndex(documents, indexPath = "repo_faiss_index") {
+// Create FAISS index with better error handling
+async function createFaissIndex(documents) {
   try {
     const embeddings = new OpenAIEmbeddings();
     const store = await FaissStore.fromDocuments(documents, embeddings);
-    await store.save(indexPath);
-    console.log(`FAISS index saved at ${indexPath}`);
     return store;
   } catch (error) {
     console.error("Error creating FAISS index:", error.message);
-    throw new Error("Failed to create FAISS index.");
+    throw error;
   }
 }
 
 // Set up the chat interface
-async function setupChatInterface(faissIndex) {
+async function setupChatInterface(vectorStore) {
   const model = new ChatOpenAI({ modelName: "gpt-4" });
   const prompt = PromptTemplate.fromTemplate(`
     Answer the following question about repositories:
     Question: {question}
     Context: {context}
+
+    Answer in a helpful and informative way. If you don't have enough information to answer, say so.
   `);
 
   const documentChain = await createStuffDocumentsChain({
@@ -86,15 +85,10 @@ async function setupChatInterface(faissIndex) {
   });
 
   return createRetrievalChain({
-    retriever: faissIndex.asRetriever(),
+    retriever: vectorStore.asRetriever(),
     combineDocsChain: documentChain,
   });
 }
-
-// Routes
-app.get("/", (req, res) => {
-  res.send("Repository Chat API Server");
-});
 
 app.get("/user", async (req, res) => {
   try {
@@ -154,54 +148,105 @@ app.get("/user/repos", async (req, res) => {
   }
 });
 
-// Initialize the FAISS index
 
+// Initialize endpoint with better error handling and state management
 app.post("/api/initialize", async (req, res) => {
+  // If already initialized, return success
+  if (globalVectorStore) {
+    return res.json({ message: "Vector store already initialized" });
+  }
+
+  // If currently initializing, return status
+  if (isInitializing) {
+    return res.status(409).json({ 
+      error: "Initialization in progress",
+      message: "Please wait for initialization to complete" 
+    });
+  }
+
   try {
-    const response = await axios.get(`http://localhost:3000/user/repos`);
+    isInitializing = true;
+    initializationError = null;
+
+    const response = await axios.get(`http://localhost:${port}/user/repos`);
     const repoData = response.data;
 
     if (!Array.isArray(repoData) || repoData.length === 0) {
-      return res.status(404).json({ error: "No repositories found" });
+      throw new Error("No repositories found");
     }
 
     const documents = formatRepoDataForFaiss(repoData);
-    vectorStore = await createFaissIndex(documents);
-    isVectorStoreReady = true; 
+    globalVectorStore = await createFaissIndex(documents);
 
     res.json({ message: "Repository index created successfully" });
   } catch (error) {
     console.error("Error initializing FAISS index:", error.message);
-    isVectorStoreReady = false; 
-    res.status(500).json({ error: "Internal server error" });
+    initializationError = error.message;
+    res.status(500).json({ 
+      error: "Failed to initialize index",
+      message: error.message 
+    });
+  } finally {
+    isInitializing = false;
   }
 });
 
+// Chat endpoint with proper vector store checking
 app.post("/api/chat", async (req, res) => {
   try {
     const { question } = req.body;
 
     if (!question || typeof question !== "string") {
-      return res.status(400).json({ error: "Invalid or missing 'question' in the request body." });
-    }
-
-    if (!isVectorStoreReady || !vectorStore) {
-      return res.status(400).json({
-        error: "FAISS index not initialized. Please call /api/initialize first.",
+      return res.status(400).json({ 
+        error: "Invalid request",
+        message: "Invalid or missing 'question' in the request body" 
       });
     }
 
-    console.log("Processing chat request:", question);
-    const qaChain = await setupChatInterface(vectorStore);
-    const response = await qaChain.invoke({ question });
+    // Check if store is initialized
+    if (!globalVectorStore) {
+      if (initializationError) {
+        return res.status(500).json({ 
+          error: "Vector store initialization failed",
+          message: initializationError 
+        });
+      } else if (isInitializing) {
+        return res.status(409).json({ 
+          error: "Vector store initializing",
+          message: "Please wait for initialization to complete" 
+        });
+      } else {
+        return res.status(400).json({ 
+          error: "Vector store not initialized",
+          message: "Please call /api/initialize first" 
+        });
+      }
+    }
 
-    res.json({ answer: response.text });
+    const qaChain = await setupChatInterface(globalVectorStore);
+    console.log("Question received for QA chain:", question);
+    //need to fix this
+    const response = await qaChain.invoke({ question });
+    console.log("QA chain response:", response);
+
+    res.json({ answer: response.answer || response.text });
   } catch (error) {
     console.error("Error processing chat:", error.message);
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({ 
+      error: "Chat processing failed",
+      message: error.message 
+    });
   }
 });
 
+// Status endpoint to check initialization state
+app.get("/api/status", (req, res) => {
+  res.json({
+    initialized: !!globalVectorStore,
+    initializing: isInitializing,
+    error: initializationError
+  });
+});
 
 // Start the server
 app.listen(port, () => {
