@@ -19,7 +19,6 @@ import Education from "./components/Education";
 import ProjectDetails from "./components/ProjectDetails";
 import Chatbot from "./components/Chatbot/index.jsx";
 
-// Memoize static styled components
 const Body = styled.div.withConfig({
   shouldComponentUpdate: true,
 })`
@@ -74,8 +73,8 @@ function App() {
           {openModal.state && (
             <ProjectDetails openModal={openModal} setOpenModal={setOpenModal} />
           )}
+          <Chatbot />
         </Body>
-        <Chatbot />
       </Router>
     </ThemeProvider>
   );

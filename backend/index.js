@@ -9,7 +9,10 @@ import { FaissStore } from "@langchain/community/vectorstores/faiss";
 import { Document } from "@langchain/core/documents";
 import { createStuffDocumentsChain } from "langchain/chains/combine_documents";
 import { createRetrievalChain } from "langchain/chains/retrieval";
-import { PromptTemplate } from "@langchain/core/prompts";
+import {
+  ChatPromptTemplate,
+  MessagesPlaceholder,
+} from "@langchain/core/prompts";
 import cors from "cors";
 import axios from "axios";
 
@@ -46,7 +49,10 @@ function formatRepoDataForFaiss(repoData) {
       `Languages: ${repo.language || "Not Specified"}`,
       `Description: ${repo.description || "No Description"}`,
       `Deployed At: ${repo.deployed_at || "Not Deployed"}`,
-      `README Content: ${(repo.readme || "No README available").slice(0, 500)}...`,
+      `README Content: ${(repo.readme || "No README available").slice(
+        0,
+        500
+      )}...`,
     ].join("\n");
 
     return new Document({
@@ -61,6 +67,7 @@ async function createFaissIndex(documents) {
   try {
     const embeddings = new OpenAIEmbeddings();
     const store = await FaissStore.fromDocuments(documents, embeddings);
+    // console.log(store);
     return store;
   } catch (error) {
     console.error("Error creating FAISS index:", error.message);
@@ -69,26 +76,33 @@ async function createFaissIndex(documents) {
 }
 
 // Set up the chat interface
-async function setupChatInterface(vectorStore) {
-  const model = new ChatOpenAI({ modelName: "gpt-4" });
-  const prompt = PromptTemplate.fromTemplate(`
-    Answer the following question about repositories:
-    Question: {question}
-    Context: {context}
+// async function setupChatInterface(vectorStore) {
+//   const model = new ChatOpenAI({ modelName: "gpt-4" });
+//   const prompt = ChatPromptTemplate.fromTemplate(`
 
-    Answer in a helpful and informative way. If you don't have enough information to answer, say so.
-  `);
+//     Answer the following question about me and my github projects.First of all, thank you for the opportunity to introduce myself. My name is Siddhesh Sonawane, and I recently graduated in 2024 with a Bachelor's in Computer Engineering from Dr. D.Y. Patil Institute of Technology, Pimpri, achieving an aggregate CGPA of 8.76. Over the past four years, I have developed a strong passion for learning and experimenting with new technologies.
+//     I started my journey with Flutter Development, where I co-led the Flutter team at GDSC DIT, and then expanded my skills into the MERN stack for full-stack development. Most recently, I have been delving into the world of AI and studying LangChain, which has deepened my interest in AI technologies.
+//     I’ve had the opportunity to participate in several hackathons, including the Smart India Hackathon and Flipkart Grid, where I was able to apply my knowledge to build innovative solutions. Some of the key projects I’ve worked on include Proctorise, an online proctoring solution, Store API, Task Manager, and an Online Radio app.
+//     I’m a focused individual, known for being a team player with a positive outlook, and I consistently strive to work efficiently towards achieving my goals.
 
-  const documentChain = await createStuffDocumentsChain({
-    llm: model,
-    prompt,
-  });
+//     Question: {question}
+//     Context: {context}
 
-  return createRetrievalChain({
-    retriever: vectorStore.asRetriever(),
-    combineDocsChain: documentChain,
-  });
-}
+//     Answer in a helpful and informative way. If you don't have enough information to answer, say so.
+//   `);
+
+//   const documentChain = await createStuffDocumentsChain({
+//     llm: model,
+//     prompt,
+//   });
+
+//   return createRetrievalChain({
+//     retriever: vectorStore.asRetriever({
+//       k: 2,
+//     }),
+//     combineDocsChain: documentChain,
+//   });
+// }
 
 app.get("/user", async (req, res) => {
   try {
@@ -111,9 +125,13 @@ app.get("/user/repos", async (req, res) => {
 
         try {
           const languageResponse = await octokit.request(repo.languages_url);
-          languages = Object.keys(languageResponse.data).join(", ") || "Not Specified";
+          languages =
+            Object.keys(languageResponse.data).join(", ") || "Not Specified";
         } catch (error) {
-          console.error(`Error fetching languages for ${repo.name}:`, error.message);
+          console.error(
+            `Error fetching languages for ${repo.name}:`,
+            error.message
+          );
         }
 
         try {
@@ -127,7 +145,10 @@ app.get("/user/repos", async (req, res) => {
           const buffer = Buffer.from(readmeResponse.data.content, "base64");
           readmeContent = buffer.toString("utf8").trim();
         } catch (error) {
-          console.error(`Error fetching README for ${repo.name}:`, error.message);
+          console.error(
+            `Error fetching README for ${repo.name}:`,
+            error.message
+          );
         }
 
         return {
@@ -148,7 +169,6 @@ app.get("/user/repos", async (req, res) => {
   }
 });
 
-
 // Initialize endpoint with better error handling and state management
 app.post("/api/initialize", async (req, res) => {
   // If already initialized, return success
@@ -158,9 +178,9 @@ app.post("/api/initialize", async (req, res) => {
 
   // If currently initializing, return status
   if (isInitializing) {
-    return res.status(409).json({ 
+    return res.status(409).json({
       error: "Initialization in progress",
-      message: "Please wait for initialization to complete" 
+      message: "Please wait for initialization to complete",
     });
   }
 
@@ -176,15 +196,16 @@ app.post("/api/initialize", async (req, res) => {
     }
 
     const documents = formatRepoDataForFaiss(repoData);
+    // console.log(documents);
     globalVectorStore = await createFaissIndex(documents);
-
+    // console.log(globalVectorStore);
     res.json({ message: "Repository index created successfully" });
   } catch (error) {
     console.error("Error initializing FAISS index:", error.message);
     initializationError = error.message;
-    res.status(500).json({ 
+    res.status(500).json({
       error: "Failed to initialize index",
-      message: error.message 
+      message: error.message,
     });
   } finally {
     isInitializing = false;
@@ -197,44 +218,69 @@ app.post("/api/chat", async (req, res) => {
     const { question } = req.body;
 
     if (!question || typeof question !== "string") {
-      return res.status(400).json({ 
+      return res.status(400).json({
         error: "Invalid request",
-        message: "Invalid or missing 'question' in the request body" 
+        message: "Invalid or missing 'question' in the request body",
       });
     }
 
     // Check if store is initialized
     if (!globalVectorStore) {
       if (initializationError) {
-        return res.status(500).json({ 
+        return res.status(500).json({
           error: "Vector store initialization failed",
-          message: initializationError 
+          message: initializationError,
         });
       } else if (isInitializing) {
-        return res.status(409).json({ 
+        return res.status(409).json({
           error: "Vector store initializing",
-          message: "Please wait for initialization to complete" 
+          message: "Please wait for initialization to complete",
         });
       } else {
-        return res.status(400).json({ 
+        return res.status(400).json({
           error: "Vector store not initialized",
-          message: "Please call /api/initialize first" 
+          message: "Please call /api/initialize first",
         });
       }
     }
 
-    const qaChain = await setupChatInterface(globalVectorStore);
+    // const qaChain = await setupChatInterface(globalVectorStore);
+    const llm = new ChatOpenAI({ modelName: "gpt-4-mini", temperature: 0 });
+    const retriever = globalVectorStore.asRetriever({
+      searchType: "similarity",
+      k: 20,
+    });
+
+    const prompt = ChatPromptTemplate.fromTemplate(`
+      Answer based on the following context:
+      Context: {context}
+      Question: {question}
+    `);
+
+    const documentChain = await createStuffDocumentsChain({
+      globalVectorStore,
+      llm,
+      prompt,
+    });
+
+    const qaChain = await createRetrievalChain({
+      retriever,
+      combineDocsChain: documentChain,
+    });
+
+    const response = await qaChain.invoke({ 
+      question: question 
+    });
+
     console.log("Question received for QA chain:", question);
-    //need to fix this
-    const response = await qaChain.invoke({ question });
     console.log("QA chain response:", response);
 
     res.json({ answer: response.answer || response.text });
   } catch (error) {
     console.error("Error processing chat:", error.message);
-    res.status(500).json({ 
+    res.status(500).json({
       error: "Chat processing failed",
-      message: error.message 
+      message: error.message,
     });
   }
 });
@@ -244,7 +290,7 @@ app.get("/api/status", (req, res) => {
   res.json({
     initialized: !!globalVectorStore,
     initializing: isInitializing,
-    error: initializationError
+    error: initializationError,
   });
 });
 
