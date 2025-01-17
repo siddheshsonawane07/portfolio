@@ -19,9 +19,7 @@
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "faiss-node": "^0.5.1",
-    "helmet": "^8.0.0",
     "langchain": "^0.3.11",
-    "morgan": "^1.10.0",
     "nodemon": "^3.1.9"
   }
 }

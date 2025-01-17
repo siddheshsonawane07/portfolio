@@ -131,9 +131,6 @@ const Chatbot = () => {
   const [isOpen, setIsOpen] = useState(false);
   const messagesEndRef = useRef(null);
 
-  useEffect(() => {
-    initializeIndex();
-  }, []);
 
   useEffect(() => {
     scrollToBottom();
@@ -145,26 +142,6 @@ const Chatbot = () => {
 
   const toggleChat = () => {
     setIsOpen(!isOpen);
-  };
-
-  const initializeIndex = async () => {
-    try {
-      const response = await fetch('http://localhost:3000/api/initialize', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to initialize index');
-      }
-      
-      const data = await response.json();
-      console.log('Index initialized:', data.message);
-    } catch (error) {
-      console.error('Failed to initialize index:', error.message);
-    }
   };
 
   const handleSubmit = async (e) => {
@@ -200,7 +177,7 @@ const Chatbot = () => {
     } catch (error) {
       setMessages((prev) => [
         ...prev,
-        { text: 'Server error. Please try again.', sender: 'bot', error: true },
+        { text: '  Failed to process the request', sender: 'bot', error: true },
       ]);
     } finally {
       setIsLoading(false);
@@ -216,7 +193,7 @@ const Chatbot = () => {
       {isOpen && (
         <>
           <ChatHeader>
-            <span>Chat about ME (with bot)</span>
+            <span>Chat</span>
             <button onClick={toggleChat}>
               <X size={24} />
             </button>

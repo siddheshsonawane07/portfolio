@@ -152,9 +152,10 @@ app.post("/api/chat", async (req, res) => {
     const response = await chain.invoke({
       input: question,
     });
-    console.log("Chain response:");
-    console.log(response.answer);
+
+    res.json({ answer: response.answer });
   } catch (error) {
-    console.log(error);
+    // console.log(error);
+    res.status(500).json({ error: "Failed to process the request" });
   }
 });
