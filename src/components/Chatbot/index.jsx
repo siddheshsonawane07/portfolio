@@ -173,7 +173,7 @@ const Chatbot = () => {
     setMessages((prev) => [...prev, { text: userMessage, sender: 'user' }]);
 
     try {
-      const response = await fetch('http://localhost:3000/api/chat', {
+      const response = await fetch('https://portfolio-dx1q.onrender.com/api/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
