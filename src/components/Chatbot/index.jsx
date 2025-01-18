@@ -15,12 +15,14 @@ const ChatContainer = styled.div`
   transition: all 0.3s ease-in-out;
   display: flex;
   flex-direction: column;
+  z-index: 1000;
 `;
 
 const ChatToggle = styled.div`
   width: 3.5rem;
   height: 3.5rem;
   background-color: #3b82f6;
+  overflow: hidden;
   border-radius: 50%;
   display: ${(props) => (props.isOpen ? 'none' : 'flex')};
   align-items: center;
@@ -38,6 +40,7 @@ const ChatHeader = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  word-break: break-word;
 
   button {
     background: none;
@@ -49,6 +52,7 @@ const ChatHeader = styled.div`
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
     &:hover {
       background-color: #2563eb;
     }
@@ -63,6 +67,8 @@ const MessagesContainer = styled.div`
   flex-direction: column;
   gap: 1rem;
   background-color: white;
+  width: 100%;
+  box-sizing: border-box;
 `;
 
 const MessageBubble = styled.div`
@@ -73,6 +79,12 @@ const MessageBubble = styled.div`
   color: ${(props) => (props.sender === 'user' ? 'white' : '#1f2937')};
   margin-left: ${(props) => (props.sender === 'user' ? 'auto' : '0')};
   ${(props) => props.error && `background-color: #fee2e2; color: #b91c1c;`}
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
+  width: fit-content;
+  max-width: 80%;
+  box-sizing: border-box;
 `;
 
 const TypingIndicator = styled.div`
@@ -81,6 +93,8 @@ const TypingIndicator = styled.div`
   border-radius: 1rem;
   background-color: #f3f4f6;
   color: #6b7280;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 `;
 
 const ChatForm = styled.form`
@@ -89,6 +103,8 @@ const ChatForm = styled.form`
   display: flex;
   gap: 0.5rem;
   background-color: white;
+  width: 100%;
+  box-sizing: border-box;
 `;
 
 const ChatInput = styled.input`
@@ -97,6 +113,7 @@ const ChatInput = styled.input`
   border: 1px solid #e5e7eb;
   border-radius: 9999px;
   outline: none;
+  min-width: 0;
   &:focus {
     border-color: #3b82f6;
   }
@@ -115,6 +132,7 @@ const SubmitButton = styled.button`
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  flex-shrink: 0;
   &:hover {
     background-color: #2563eb;
   }
