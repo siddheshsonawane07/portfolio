@@ -92,10 +92,8 @@ app.get("/user/repos", async (_, res) => {
             sort: 'updated',
             direction: 'desc'
         });
-        
-        const recentRepos = data.slice(0, MAX_REPOS);
-        
-        const repoDetails = await Promise.all(recentRepos.map(async (repo) => ({
+                
+        const repoDetails = await Promise.all(data.map(async (repo) => ({
             name: repo.name,
             url: repo.html_url || "Not Specified",
             language: await fetchRepoLanguages(repo),
