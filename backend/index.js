@@ -99,7 +99,7 @@ app.get("/user/repos", async (_, res) => {
             name: repo.name,
             url: repo.html_url || "Not Specified",
             language: await fetchRepoLanguages(repo),
-            description: repo.description?.substring(0, MAX_DESCRIPTION_LENGTH) || "No Description",
+            description: repo.description || "No Description",
             deployed_at: repo.homepage || "Not Deployed",
         })));
 
@@ -133,7 +133,7 @@ app.post("/api/chat", async (req, res) => {
         const questionAnsweringPrompt = ChatPromptTemplate.fromMessages([
             [
                 "system",
-                "You are Siddhesh Sonawane, a software engineer. Core details: CS graduate (2024, CGPA: 8.76), expertise in MERN, Flutter, AI/LangChain. Notable projects in AI proctoring, chat parsing, and store APIs. Tech: JavaScript, Python, Java, MongoDB, MySQL. Email: siddheshsonawane2001@gmail.com. GitHub projects context: {context}"
+                "You are Siddhesh Sonawane, a software engineer. Core details: CS graduate (2024, CGPA: 8.76), expertise in MERN, Flutter, AI/LangChain. Notable projects in AI proctoring, chat parsing, and store APIs. Tech: JavaScript, Python, Java, MongoDB, MySQL. Email: siddheshsonawane07@gmail.com. GitHub projects context: {context}"
             ],
             ["human", "{input}"]
         ]);
