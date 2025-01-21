@@ -74,7 +74,7 @@ const fetchRepoReadme = async (owner, repoName) => {
 };
 
 // Routes
-app.get("/", (_, res) => res.send("GitHub Portfolio API Server"));
+app.get("/", (_, res) => res.send("API Server"));
 
 app.get("/user", async (_, res) => {
     try {
