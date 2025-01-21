@@ -14,7 +14,6 @@ dotenv.config();
 // Constants
 const PORT = process.env.PORT || 3000;
 const REQUIRED_ENV_VARS = ['GITHUB_AUTH_TOKEN', 'OPENAI_API_KEY'];
-const MAX_REPOS = 20;
 const MAX_DESCRIPTION_LENGTH = 200;
 
 // Validate environment variables
@@ -128,8 +127,7 @@ app.post("/api/chat", async (req, res) => {
             direction: 'desc'
         });
         
-        const recentRepos = raw_repoData.slice(0, MAX_REPOS);
-        const documents = formatRepoDataForFaiss(recentRepos);
+        const documents = formatRepoDataForFaiss(raw_repoData);
         const vectorStore = await FaissStore.fromDocuments(documents, embeddings);
 
         const questionAnsweringPrompt = ChatPromptTemplate.fromMessages([
