@@ -5,10 +5,9 @@ export const Bio = {
     "I am a motivated and versatile individual, always eager to take on new challenges. With a passion for learning I am dedicated to delivering high-quality results. With a positive attitude and a growth mindset, I am ready to make a meaningful contribution and achieve great things.",
   github: "https://github.com/siddheshsonawane07",
   resume:
-    "https://drive.google.com/file/d/1Ycj8UmX0F64YbXN3tkX_H6wSr0izhPSH/view?usp=sharing",
+    "https://drive.google.com/file/d/1LxQ8RxOGTQNac-s4ZPiPh4-3zYTiNMZK/view?usp=sharing",
   linkedin: "https://www.linkedin.com/in/siddheshsonawane07/",
   twitter: "https://x.com/siddhesh_07_dev",
-  insta: "https://www.instagram.com/_siddhesh___07/",
   medium: "https://medium.com/@siddheshsonawane07",
 };
 
@@ -176,6 +175,20 @@ export const experiences = [
       "Figma",
     ],
   },
+  {
+    id: 3,
+    img: "https://xalta.tech/wp-content/uploads/2022/12/XTSPL-Logo.png",
+    role: "Developer",
+    company: "Xalta Technologies",
+    date: "Currently Working",
+    desc: "RPA Developer at Xalta Technologies, where I am responsible for developing and implementing automation solutions using UiPath.",
+    skills: [
+      "Python", 
+      "MySQL",
+      "UiPath",
+      "C#"
+    ],
+  },
 ];
 
 export const education = [
@@ -208,6 +221,30 @@ export const education = [
 export const projects = [
   {
     id: 0,
+    title: "Github API RAG",
+    date: "Nov 2024 - Dec 2024",
+    description:
+      "I built an AI-powered chatbot using LangChain.js and LLM models to make my GitHub profile interactive, allowing visitors to explore my repositories, tech stack, and project highlights through natural conversations. The backend leverages the GitHub API, FAISS vector store, and Express.js, while the frontend integrates seamlessly into my React.js portfolio. This project enhances engagement and showcases my expertise in full-stack development and AI-powered applications.",
+    image:"https://firebasestorage.googleapis.com/v0/b/proctorise-22190.appspot.com/o/portfolio_imgs%2FScreenshot%202025-03-29%20131722.png?alt=media&token=e1911baf-ca22-465a-a731-02d80d67760c",
+    tags: ["Langchain.js","React.js","Express.js", "Node.js", "Firebase", "Netlify"],
+    category: "web app",
+    github: "https://github.com/siddheshsonawane07/github_langchain_chatbot",
+    webapp: "https://sid07portfolio.netlify.app/",
+  },
+  {
+    id: 1,
+    title: "Whatsapp Chat Parser CLI",
+    date: "Oct 2024 - Nov 2024",
+    description:
+      "WhatsApp Chat Parser CLI is a simple command-line tool that converts WhatsApp chat exports into a clean JSON format while preserving message order, handling multi-line messages, and supporting media indicators. It offers a user-friendly CLI with options for formatted output, custom file naming, and easy installation via npm. Built with Node.js and Commander.js, this tool simplifies WhatsApp chat data analysis.",
+    image:"https://firebasestorage.googleapis.com/v0/b/proctorise-22190.appspot.com/o/portfolio_imgs%2FScreenshot%202025-03-29%20131954.png?alt=media&token=3d1fbe2d-7b7d-48af-8f1c-f80860c4575f",
+    tags: ["Node.js", "Commander.js"],
+    category: "web app",
+    github: "https://github.com/siddheshsonawane07/jsonify_whatsapp_exports",
+    webapp: "https://www.npmjs.com/package/whatsapp-chat-parser-cli",
+  },
+  {
+    id: 3,
     title: "Proctorise",
     date: "Feb 2024 - Apr 2024",
     description:
@@ -220,7 +257,7 @@ export const projects = [
     webapp: "https://proctorise.netlify.app/",
   },
   {
-    id: 1,
+    id: 4,
     title: "Store API",
     date: "May 2023 - Jun 2023",
     description:
@@ -233,7 +270,7 @@ export const projects = [
     webapp: "https://sidstoreapi.netlify.app/",
   },
   {
-    id: 2,
+    id: 5,
     title: "Task Manager API",
     date: "Jul 2023 - Aug 2023",
     description:
@@ -246,7 +283,7 @@ export const projects = [
     webapp: "https://sidtaskmanager.netlify.app/",
   },
   {
-    id: 3,
+    id: 6,
     title: "Online Radio",
     date: "Nov 2021 - Nov 2021",
     description:
@@ -259,7 +296,7 @@ export const projects = [
     webapp: "https://youtu.be/__Pg9mWoLng?si=pa0IloOxC_khTXaH",
   },
   {
-    id: 4,
+    id: 7,
     title: "Wordle",
     date: "Nov 2022 - Nov 2022",
     description:
@@ -272,7 +309,7 @@ export const projects = [
     webapp: "https://youtu.be/nitKyOdonRw?si=SDTqsYEk8rOwhGhH",
   },
   {
-    id: 5,
+    id: 8,
     title: "Movies App",
     date: "Jul 2022 - Jul 2022",
     description:
@@ -285,7 +322,7 @@ export const projects = [
     webapp: "https://youtu.be/fiZTT-TITFw?si=_pXbaq8aLzA_n7Zr",
   },
   {
-    id: 6,
+    id: 9,
     title: "Ecommerce Catalog UI",
     date: "Jul 2022 - Jul 2022",
     description:
@@ -298,7 +335,7 @@ export const projects = [
     webapp: "https://youtu.be/QBNVSmVDyZI?si=prZaVEIawslmopWV",
   },
   {
-    id: 7,
+    id: 10,
     title: "Solar System UI",
     date: "Jul 2022 - Jul 2022",
     description:
@@ -311,7 +348,7 @@ export const projects = [
     webapp: "https://youtu.be/lyvNFa4Yg-g?si=gLS0Z_fYe_g-t3Hp",
   },
   {
-    id: 8,
+    id: 11,
     title: "Reddit Meme Share",
     date: "Sept 2021 - Sept 2021",
     description:
@@ -324,3 +361,4 @@ export const projects = [
     webapp: "https://youtu.be/B-CnxZ0ysIg?si=dKjCpplSjW4C98kj",
   },
 ];
+  
