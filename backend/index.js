@@ -14,7 +14,6 @@ dotenv.config();
 // Constants
 const PORT = process.env.PORT || 3000;
 const REQUIRED_ENV_VARS = ['GITHUB_AUTH_TOKEN', 'OPENAI_API_KEY'];
-const MAX_REPOS = 20;
 const MAX_DESCRIPTION_LENGTH = 200;
 
 // Validate environment variables
@@ -74,7 +73,7 @@ const fetchRepoReadme = async (owner, repoName) => {
 };
 
 // Routes
-app.get("/", (_, res) => res.send("GitHub Portfolio API Server"));
+app.get("/", (_, res) => res.send("API Server"));
 
 app.get("/user", async (_, res) => {
     try {
@@ -93,14 +92,12 @@ app.get("/user/repos", async (_, res) => {
             sort: 'updated',
             direction: 'desc'
         });
-        
-        const recentRepos = data.slice(0, MAX_REPOS);
-        
-        const repoDetails = await Promise.all(recentRepos.map(async (repo) => ({
+                
+        const repoDetails = await Promise.all(data.map(async (repo) => ({
             name: repo.name,
             url: repo.html_url || "Not Specified",
             language: await fetchRepoLanguages(repo),
-            description: repo.description?.substring(0, MAX_DESCRIPTION_LENGTH) || "No Description",
+            description: repo.description || "No Description",
             deployed_at: repo.homepage || "Not Deployed",
         })));
 
@@ -128,14 +125,13 @@ app.post("/api/chat", async (req, res) => {
             direction: 'desc'
         });
         
-        const recentRepos = raw_repoData.slice(0, MAX_REPOS);
-        const documents = formatRepoDataForFaiss(recentRepos);
+        const documents = formatRepoDataForFaiss(raw_repoData);
         const vectorStore = await FaissStore.fromDocuments(documents, embeddings);
 
         const questionAnsweringPrompt = ChatPromptTemplate.fromMessages([
             [
                 "system",
-                "You are Siddhesh Sonawane, a software engineer. Core details: CS graduate (2024, CGPA: 8.76), expertise in MERN, Flutter, AI/LangChain. Notable projects in AI proctoring, chat parsing, and store APIs. Tech: JavaScript, Python, Java, MongoDB, MySQL. Email: siddheshsonawane2001@gmail.com. GitHub projects context: {context}"
+                "You are Siddhesh Sonawane, a software engineer. Core details: CS graduate (2024, CGPA: 8.76), expertise in MERN, Flutter, AI/LangChain. Notable projects in AI proctoring, chat parsing, and store APIs. Tech: JavaScript, Python, Java, MongoDB, MySQL. Email: siddheshsonawane07@gmail.com. GitHub projects context: {context}"
             ],
             ["human", "{input}"]
         ]);
